@@ -1,4 +1,4 @@
-﻿@model Contactform
+﻿@* @model Contactform
 @{
     ViewData["Title"] = "Contactpagina";
 }
@@ -11,12 +11,12 @@
         <form method="post" class="form-contactpagina">
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="firstname">Voornaam: </label>
+                <label for="firstname">Voornaam*: </label>
                 <input type="text" asp-for="FirstName" name="firstname" id="firstname" required>
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="lastname">Achternaam: </label>
+                <label for="lastname">Achternaam*: </label>
                 <input type="text" asp-for="LastName" name="lastname" id="lastname" required>
             </div>
 
@@ -26,16 +26,19 @@
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="phone">Telefoonnummer: </label>
-                <input type="tel" asp-for="Phone" name="phone" id="phone">
+                <label for="phone">Telefoonnummer*: </label>
+                <input type="tel" asp-for="Phone" name="phone" id="phone" required>
             </div>
 
             <div class="form-contactpagina__inputelement">
+                <input type="reset" value="Reset">
+
                 <input type="submit" value="Verstuur!">
             </div>
 
         </form>
 
+        <p>* = required</p>
     </section>
 </div>
 
@@ -44,7 +47,7 @@
 //    const inputEmail = document.getElementById('email');
 
 
-//    const validateEmail = () => { 
+//    const validateEmail = () => {
 //        if (inputEmail.validity.typeMismatch) {
 //            inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
 //            inputEmail.reportValidity();
@@ -81,7 +84,7 @@
 //        const formData = new URLSearchParams();
 
 //        formData.append('email', form.email.value);
-        
+
 //        formData.append('__RequestVerificationToken', csrfToken); // Voeg CSRF-token toe
 
 //        // Voer een POST-verzoek uit
@@ -114,4 +117,254 @@
 
 
 
+
+
 </script>
+ *@
+
+
+@model Contactform
+@{
+    ViewData["Title"] = "Contactpagina";
+}
+
+<div class="page">
+    <section class="personalia">
+
+        <img class="person-logo" src="images/person-pasfoto.png">
+
+        <h1 class="person-name">Zara Klaren</h1>
+
+
+    </section>
+
+
+    <section class="contact">
+        <h1>Contact</h1>
+        <p>@ViewBag.Message</p>
+        <div id="flash-message" class="flash-message" style="display: none;"></div>
+
+        <form method="post" class="form-contactpagina">
+            @Html.AntiForgeryToken() 
+
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="firstname">Voornaam*: </label>
+                <input type="text" asp-for="FirstName" id="firstname" required>
+            </div>
+
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="lastname">Achternaam*: </label>
+                <input type="text" asp-for="LastName" id="lastname" required>
+            </div>
+
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="email">E-mailadres: </label>
+                <input type="email" asp-for="Email" id="email">
+            </div>
+
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="phone">Telefoonnummer*: </label>
+                <input type="tel" asp-for="Phone" id="phone" required>
+            </div>
+
+            <div class="form-contactpagina__inputelement">
+                <div class="buttons">
+                <input type="reset" class="button-verstuur" value="Reset">
+                    <div id="spinner" class="spinner"></div>
+
+                <input type="submit" class="button-reset" value="Verstuur!">
+                </div>
+            </div>
+
+        </form>
+
+        <p>* = required</p>
+
+    </section>
+</div>
+
+<script>
+
+
+    //     // Functie voor e-mailvalidatie
+    //     // const validateEmail = () => {
+    //     //     if (inputEmail.validity.typeMismatch) {
+    //     //         inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
+    //     //         inputEmail.reportValidity();
+    //     //     } else if (inputEmail.value.length > 80) {
+    //     //         inputEmail.setCustomValidity("Email moet niet langer dan 80 tekens zijn!");
+    //     //     } else {
+    //     //         inputEmail.setCustomValidity("");
+    //     //     }
+    //     // };
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector('.form-contactpagina');
+        const inputEmail = document.getElementById('email');
+        const inputFirstName = document.getElementById('firstname');
+        const inputLastName = document.getElementById('lastname');
+        const inputPhone = document.getElementById('phone');
+        const submitButton = document.querySelector('input[type="submit"]');
+        const spinner = document.getElementById('spinner');
+
+        // functies om de spinner te tonen en knop te (de)activeren
+        const showSpinner = () => {
+            spinner.style.display = "inline-block"; // Toon de spinner
+            submitButton.disabled = true; // Deactiveer knop
+        };
+        const hideSpinner = () => {
+            spinner.style.display = "none"; // Verberg de spinner
+            submitButton.disabled = false; // Activeer knop
+        };
+
+        const updateFieldStyle = (input, isValid) => {
+            if (isValid) {
+                input.classList.remove("error");
+            } else {
+                input.classList.add("error");
+            }
+        };
+
+
+        // emailvalidatie
+        const validateEmail = () => {
+            const maxLength = 80;
+            const emailValue = inputEmail.value.trim();
+            let isValid = true;
+
+            if (inputEmail.validity.typeMismatch) {
+                inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
+                isValid = false;
+            } else if (emailValue.length > maxLength) {
+                inputEmail.setCustomValidity(`Email mag niet langer dan ${maxLength} tekens zijn!`);
+                isValid = false;
+            } else {
+                inputEmail.setCustomValidity("");
+            }
+
+            updateFieldStyle(inputEmail, isValid);
+            inputEmail.reportValidity();
+        };
+
+        // namen validatie
+        const validateName = (input) => {
+            const minLength = 2;
+            const maxLength = 60;
+            const nameValue = input.value.trim();
+            let isValid = true;
+
+            if (nameValue.length < minLength) {
+                input.setCustomValidity(`Moet minimaal ${minLength} tekens bevatten.`);
+                isValid = false;
+            } else if (nameValue.length > maxLength) {
+                input.setCustomValidity(`Mag niet langer dan ${maxLength} tekens zijn.`);
+                isValid = false;
+            } else {
+                input.setCustomValidity("");
+            }
+
+            updateFieldStyle(input, isValid);
+            input.reportValidity();
+        };
+
+        // telefoonnummer validatie
+        const validatePhone = () => {
+            const phoneValue = inputPhone.value.trim();
+            const phonePattern = /^[0-9+\-]{8,20}$/; // alleen cijfers, + en -
+            let isValid = phonePattern.test(phoneValue);
+
+            if (!isValid) {
+                inputPhone.setCustomValidity("Voer een geldig telefoonnummer in (8-20 cijfers, alleen + of - toegestaan).");
+            } else {
+                inputPhone.setCustomValidity("");
+            }
+
+            updateFieldStyle(inputPhone, isValid);
+            inputPhone.reportValidity();
+        };
+        const validateForm = () => {
+            validateEmail();
+            validateName(inputFirstName);
+            validateName(inputLastName);
+            validatePhone();
+        }
+
+        // eventlisteners voor validatie
+        inputEmail.addEventListener("blur", validateEmail);
+        inputEmail.addEventListener("input", validateEmail);
+
+        inputFirstName.addEventListener("blur", () => validateName(inputFirstName));
+        inputFirstName.addEventListener("input", () => validateName(inputFirstName));
+
+        inputLastName.addEventListener("blur", () => validateName(inputLastName));
+        inputLastName.addEventListener("input", () => validateName(inputLastName));
+
+        inputPhone.addEventListener("blur", validatePhone);
+        inputPhone.addEventListener("input", validatePhone);
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            validateForm();
+
+            if (!form.checkValidity()) {
+                return;
+            }
+            showSpinner();
+            const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const formData = new URLSearchParams(new FormData(form));
+
+            fetch('/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP-fout! Status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    //flash message voor succes
+                    const flashMessage = document.getElementById("flash-message");
+                    flashMessage.textContent = "Het contactformulier is verstuurd!";
+                    flashMessage.style.display = "block";
+                    flashMessage.classList.remove("error");
+                    flashMessage.classList.add("success");
+
+                    form.reset();
+
+                    document.querySelectorAll('.error').forEach(input => {
+                        input.classList.remove('error');
+                    });
+
+                    setTimeout(() => { //flash message na 5 sec weg
+                        flashMessage.style.display = "none";
+                    }, 5000);
+                })
+                .catch(error => {
+                    console.error('Er was een probleem met de formulierinzending:', error);
+
+                    // message foutmelding
+                    const flashMessage = document.getElementById("flash-message");
+                    flashMessage.textContent = "Er is iets misgegaan. Probeer het opnieuw.";
+                    flashMessage.style.display = "block";
+                    flashMessage.classList.remove("success");
+                    flashMessage.classList.add("error");
+
+                    setTimeout(() => {
+                        flashMessage.style.display = "none";
+                    }, 5000);
+                })
+                .finally(() => {
+                    hideSpinner();
+                });
+        });
+    });
+
+</script>
+
