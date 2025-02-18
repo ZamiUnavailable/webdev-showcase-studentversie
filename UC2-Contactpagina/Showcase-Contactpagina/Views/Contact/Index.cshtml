@@ -92,8 +92,8 @@
     };
     function onCaptchaSuccess(token) {
         document.getElementById("recaptchaTokenInputId").value = token;
-    checkFormValidity(); 
-}
+        document.querySelector('input[type="submit"]').disabled = false;
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.querySelector('.form-contactpagina');
@@ -145,6 +145,25 @@
             return isValid;
         };
 
+        const validateEmail1 = () => {
+                const maxLength = 80;
+                const emailValue = inputEmail.value.trim();
+                let isValid = true;
+
+                if (inputEmail.validity.typeMismatch) {
+                    inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
+                    isValid = false;
+                } else if (emailValue.length > maxLength) {
+                    inputEmail.setCustomValidity(`Email mag niet langer dan ${maxLength} tekens zijn!`);
+                    isValid = false;
+                } else {
+                    inputEmail.setCustomValidity("");
+                }
+
+                updateFieldStyle(inputEmail, isValid);
+                return isValid;
+      };
+
         const validateName = (input) => {
             const minLength = 2;
             const maxLength = 60;
@@ -165,6 +184,25 @@
             input.reportValidity();
             return isValid;
         };
+            const validateName1 = (input) => {
+                const minLength = 2;
+                const maxLength = 60;
+                const nameValue = input.value.trim();
+                let isValid = true;
+
+                if (nameValue.length < minLength) {
+                    input.setCustomValidity(`Moet minimaal ${minLength} tekens bevatten.`);
+                    isValid = false;
+                } else if (nameValue.length > maxLength) {
+                    input.setCustomValidity(`Mag niet langer dan ${maxLength} tekens zijn.`);
+                    isValid = false;
+                } else {
+                    input.setCustomValidity("");
+                }
+
+                updateFieldStyle(input, isValid);
+                return isValid;
+            };
 
         const validatePhone = () => {
             const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
@@ -179,6 +217,21 @@
 
             updateFieldStyle(inputPhone, isValid);
             inputPhone.reportValidity();
+            return isValid;
+        };
+        
+        const validatePhone1 = () => {
+            const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
+            const phonePattern = /^[0-9+\-]{8,20}$/; // alleen cijfers, + en -
+            let isValid = phonePattern.test(phoneValue);
+
+            if (!isValid) {
+                inputPhone.setCustomValidity("Voer een geldig telefoonnummer in (8-20 cijfers, alleen + of - toegestaan).");
+            } else {
+                inputPhone.setCustomValidity("");
+            }
+
+            updateFieldStyle(inputPhone, isValid);
             return isValid;
         };
 
@@ -239,11 +292,24 @@
         }
 
 
-          const checkFormValidity = () => {
-        const isFormValid = validateEmail() &&
-                            validateName(inputFirstName) &&
-                            validateName(inputLastName) &&
-                            validatePhone() &&
+      const checkFormValidity = () => {
+    const isFormValid = validateEmail() &&
+                        validateName(inputFirstName) &&
+                        validateName(inputLastName) &&
+                        validatePhone() &&
+                        validateSubject() &&
+                        validateMessage();
+    
+    const isCaptchaCompleted = grecaptcha.getResponse().length > 0;
+
+    submitButton.disabled = !(isFormValid && isCaptchaCompleted);
+};
+
+    const checkFormValidity1 = () => {
+        const isFormValid = validateEmai1l() &&
+                            validateName1(inputFirstName) &&
+                            validateName1(inputLastName) &&
+                            validatePhone1() &&
                             validateSubject() &&
                             validateMessage();
 
@@ -253,31 +319,31 @@
     };
         
         [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
-            input.addEventListener("input", checkFormValidity);
+            input.addEventListener("input", checkFormValidity1);
         });
 
         [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
-            input.addEventListener("blur", checkFormValidity);
+            input.addEventListener("blur", checkFormValidity1);
         });
 
-       // // eventlisteners voor validatie
-       //  inputEmail.addEventListener("blur", validateEmail);
-       //  inputEmail.addEventListener("input", validateEmail);
+       // eventlisteners voor validatie
+        inputEmail.addEventListener("blur", validateEmail);
+        inputEmail.addEventListener("input", validateEmail);
 
-       //  inputFirstName.addEventListener("blur", () => validateName(inputFirstName));
-       //  inputFirstName.addEventListener("input", () => validateName(inputFirstName));
+        inputFirstName.addEventListener("blur", () => validateName(inputFirstName));
+        inputFirstName.addEventListener("input", () => validateName(inputFirstName));
 
-       //  inputLastName.addEventListener("blur", () => validateName(inputLastName));
-       //  inputLastName.addEventListener("input", () => validateName(inputLastName));
+        inputLastName.addEventListener("blur", () => validateName(inputLastName));
+        inputLastName.addEventListener("input", () => validateName(inputLastName));
 
-       //  inputPhone.addEventListener("blur", validatePhone);
-       //  inputPhone.addEventListener("input", validatePhone);
+        inputPhone.addEventListener("blur", validatePhone);
+        inputPhone.addEventListener("input", validatePhone);
 
-       //  inputSubject.addEventListener("blur", validateSubject);
-       //  inputSubject.addEventListener("input", validateSubject);
+        inputSubject.addEventListener("blur", validateSubject);
+        inputSubject.addEventListener("input", validateSubject);
 
-       //  inputMessage.addEventListener("blur", validateMessage);
-       //  inputMessage.addEventListener("input", validateMessage);
+        inputMessage.addEventListener("blur", validateMessage);
+        inputMessage.addEventListener("input", validateMessage);
 
 
         form.addEventListener('submit', function (event) {
