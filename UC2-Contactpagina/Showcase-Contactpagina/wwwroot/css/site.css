@@ -95,25 +95,25 @@
 
 
 
-.button-reset {
+.button-verstuur {
     background-color: #d5f5d5;
     padding: 10px;
     border-radius: 10px;
     border: 1px solid gray;
 }
 
-    .button-reset:hover {
+    .button-verstuur:hover {
         background-color: #c5e3c5;
     }
 
-.button-verstuur {
+.button-reset {
     background-color: #f3c4be;
     padding: 10px;
     border-radius: 10px;
     border: 1px solid gray;
 }
 
-    .button-verstuur:hover {
+    .button-reset:hover {
         background-color: #e7b5ae;
     }
 

@@ -1,132 +1,16 @@
-﻿@* @model Contactform
+﻿@model Contactform
 @{
     ViewData["Title"] = "Contactpagina";
 }
+@inject IConfiguration configuration
+@{
+    var siteKey = configuration["reCaptchaSettings:SiteKey"];
+}
 
-<div class="page">
-    <section class="contact">
-
-        <h1>Contact</h1>
-        <p>@ViewBag.Message</p>
-        <form method="post" class="form-contactpagina">
-
-            <div class="form-contactpagina__inputelement fx-col">
-                <label for="firstname">Voornaam*: </label>
-                <input type="text" asp-for="FirstName" name="firstname" id="firstname" required>
-            </div>
-
-            <div class="form-contactpagina__inputelement fx-col">
-                <label for="lastname">Achternaam*: </label>
-                <input type="text" asp-for="LastName" name="lastname" id="lastname" required>
-            </div>
-
-            <div class="form-contactpagina__inputelement fx-col">
-                <label for="email">E-mailadres: </label>
-                <input type="email" asp-for="Email" name="email" id="email">
-            </div>
-
-            <div class="form-contactpagina__inputelement fx-col">
-                <label for="phone">Telefoonnummer*: </label>
-                <input type="tel" asp-for="Phone" name="phone" id="phone" required>
-            </div>
-
-            <div class="form-contactpagina__inputelement">
-                <input type="reset" value="Reset">
-
-                <input type="submit" value="Verstuur!">
-            </div>
-
-        </form>
-
-        <p>* = required</p>
-    </section>
-</div>
-
-
-<script>
-//    const inputEmail = document.getElementById('email');
-
-
-//    const validateEmail = () => {
-//        if (inputEmail.validity.typeMismatch) {
-//            inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
-//            inputEmail.reportValidity();
-//        } else if (inputEmail.value.length > 80) {
-//            inputEmail.setCustomValidity("Email moet niet langer dan 80 tekens zijn!");
-//        } else {
-//            inputEmail.setCustomValidity("");
-//        }
-//    }
-
-//    const validateForm = () => {
-//        validateEmail();
-//    }
-
-//    // Event listener voor email
-//    // Aanbevolen events voor formulieren: https://github.com/Windesheim-HBO-ICT/client_studenten/blob/main/lessen/week-2/les-1/form-constraint-validation-api/studentversie/events-voor-invoer-validatie.md
-//    inputEmail.addEventListener("blur", validateEmail);
-//    inputEmail.addEventListener("input", validateEmail);
-
-//    // Selecteer het formelement
-//    const form = document.querySelector('.form-contactpagina');
-
-//    // Event listener voor formulierinzending
-//    form.addEventListener('submit', function (event) {
-//        event.preventDefault(); // Voorkom standaard formulierinzending
-
-//       // Valideer alle velden voor de zekerheid
-//        validateForm();
-
-//        // Verkrijg CSRF-token van het formulier
-//        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-//        // Serialiseer formuliergegevens
-//        const formData = new URLSearchParams();
-
-//        formData.append('email', form.email.value);
-
-//        formData.append('__RequestVerificationToken', csrfToken); // Voeg CSRF-token toe
-
-//        // Voer een POST-verzoek uit
-//        fetch('/contact', {
-//            method: 'POST',
-//            headers: {
-//                'Content-Type': 'application/x-www-form-urlencoded' // Stel de inhoudstype in
-//            },
-//            body: formData // Stuur de geserialiseerde formuliergegevens als de body
-//        })
-//            .then(response => {
-//                if (!response.ok) {
-//                    throw new Error('Netwerkrespons was niet ok');
-//                }
-//                return response.text();
-//            })
-//            .then(data => {
-//                // Verwerk succesvolle formulierinzending
-//                console.log('Formulier succesvol ingediend:', data);
-//                // Optioneel: je kunt hier een redirect uitvoeren of een succesbericht tonen
-//            })
-//            .catch(error => {
-//                console.error('Er was een probleem met de formulierinzending:', error);
-
-//                alert(error.message)
-
-//                // Verwerk fouten hier
-//            });
-//    });
-
-
-
-
-
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+        async defer>
 </script>
- *@
 
-
-@model Contactform
-@{
-    ViewData["Title"] = "Contactpagina";
-}
 
 <div class="page">
     <section class="personalia">
@@ -145,59 +29,71 @@
         <div id="flash-message" class="flash-message" style="display: none;"></div>
 
         <form method="post" class="form-contactpagina">
-            @Html.AntiForgeryToken() 
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="recaptchaTokenInputId" asp-for="RecaptchaToken" />
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="firstname">Voornaam*: </label>
+                <label for="firstname">Voornaam* </label>
                 <input type="text" asp-for="FirstName" id="firstname" required>
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="lastname">Achternaam*: </label>
+                <label for="lastname">Achternaam* </label>
                 <input type="text" asp-for="LastName" id="lastname" required>
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="email">E-mailadres: </label>
+                <label for="email">E-mailadres </label>
                 <input type="email" asp-for="Email" id="email">
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
-                <label for="phone">Telefoonnummer*: </label>
+                <label for="phone">Telefoonnummer* </label>
                 <input type="tel" asp-for="Phone" id="phone" required>
             </div>
 
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="subject">Onderwerp </label>
+                <input type="text" asp-for="Subject" id="subject">
+            </div>
+
+            <div class="form-contactpagina__inputelement fx-col">
+                <label for="message">Bericht</label>
+                <textarea asp-for="Message" id="message" rows="4"></textarea>
+            </div>
+
+            <div id="html_element"></div>
+            <hr />
+
             <div class="form-contactpagina__inputelement">
                 <div class="buttons">
-                <input type="reset" class="button-verstuur" value="Reset">
-                        <div id="spinner" class="spinner"></div>
+                    <input type="reset" class="button-reset" value="Reset">
+                    <div id="spinner" class="spinner"></div>
 
-                <input type="submit" class="button-reset" value="Verstuur!">
+                    <input type="submit" class="button-verstuur" disabled="disabled" value="Verstuur!">
                 </div>
             </div>
 
         </form>
 
-        <p>* = required</p>
+        <p>* verplicht veld</p>
 
     </section>
 </div>
 
 <script>
 
-
-    //     // Functie voor e-mailvalidatie
-    //     // const validateEmail = () => {
-    //     //     if (inputEmail.validity.typeMismatch) {
-    //     //         inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
-    //     //         inputEmail.reportValidity();
-    //     //     } else if (inputEmail.value.length > 80) {
-    //     //         inputEmail.setCustomValidity("Email moet niet langer dan 80 tekens zijn!");
-    //     //     } else {
-    //     //         inputEmail.setCustomValidity("");
-    //     //     }
-    //     // };
-
+     var onloadCallback = function() {
+      // alert("grecaptcha is ready!");
+      grecaptcha.render('html_element', {
+          'sitekey' : '@siteKey',
+          'callback': onCaptchaSuccess
+        });
+    };
+    function onCaptchaSuccess(token) {
+        document.getElementById("recaptchaTokenInputId").value = token;
+    checkFormValidity(); 
+}
 
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.querySelector('.form-contactpagina');
@@ -205,17 +101,20 @@
         const inputFirstName = document.getElementById('firstname');
         const inputLastName = document.getElementById('lastname');
         const inputPhone = document.getElementById('phone');
+        const inputSubject = document.getElementById('subject');
+        const inputMessage = document.getElementById('message');
+        const captcha = document.getElementById('recaptchaTokenInputId');
         const submitButton = document.querySelector('input[type="submit"]');
         const spinner = document.getElementById('spinner');
 
         // functies om de spinner te tonen en knop te (de)activeren
         const showSpinner = () => {
-            spinner.style.display = "inline-block"; // Toon de spinner
-            submitButton.disabled = true; // Deactiveer knop
+            spinner.style.display = "inline-block";
+            submitButton.disabled = true;
         };
         const hideSpinner = () => {
-            spinner.style.display = "none"; // Verberg de spinner
-            submitButton.disabled = false; // Activeer knop
+            spinner.style.display = "none";
+            submitButton.disabled = false;
         };
 
         const updateFieldStyle = (input, isValid) => {
@@ -226,8 +125,6 @@
             }
         };
 
-
-        // emailvalidatie
         const validateEmail = () => {
             const maxLength = 80;
             const emailValue = inputEmail.value.trim();
@@ -245,9 +142,9 @@
 
             updateFieldStyle(inputEmail, isValid);
             inputEmail.reportValidity();
+            return isValid;
         };
 
-        // namen validatie
         const validateName = (input) => {
             const minLength = 2;
             const maxLength = 60;
@@ -266,11 +163,11 @@
 
             updateFieldStyle(input, isValid);
             input.reportValidity();
+            return isValid;
         };
 
-        // telefoonnummer validatie
         const validatePhone = () => {
-            const phoneValue = inputPhone.value.trim();
+            const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
             const phonePattern = /^[0-9+\-]{8,20}$/; // alleen cijfers, + en -
             let isValid = phonePattern.test(phoneValue);
 
@@ -282,43 +179,140 @@
 
             updateFieldStyle(inputPhone, isValid);
             inputPhone.reportValidity();
+            return isValid;
         };
+
+        const validateSubject = () => {
+            const maxLength = 200;
+            const subjectValue = inputSubject.value.trim();
+            let isValid = true;
+
+           if (subjectValue.length > maxLength) {
+                inputSubject.setCustomValidity(`Onderwerp mag niet langer dan ${maxLength} tekens zijn!`);
+                isValid = false;
+            } else {
+                inputSubject.setCustomValidity("");
+            }
+
+            updateFieldStyle(inputSubject, isValid);
+            inputSubject.reportValidity();
+            return isValid;
+        };
+
+        const validateMessage = () => {
+            const maxLength = 600;
+            const messageValue = inputMessage.value.trim();
+            let isValid = true;
+
+            if (messageValue.length > maxLength) {
+                inputMessage.setCustomValidity(`Bericht mag niet langer dan ${maxLength} tekens zijn!`);
+                isValid = false;
+            } else {
+                inputMessage.setCustomValidity("");
+            }
+
+            updateFieldStyle(inputMessage, isValid);
+            inputMessage.reportValidity();
+            return isValid;
+        };
+
+
+
+        const validateCaptcha = () => {
+            let token = grecaptcha.getResponse();
+            if (!token) {
+                return false;
+            }
+            document.getElementById("recaptchaTokenInputId").value = token;
+            return true;
+        };
+
+
         const validateForm = () => {
             validateEmail();
             validateName(inputFirstName);
             validateName(inputLastName);
             validatePhone();
+            validateSubject();
+            validateMessage();
+            validateCaptcha();
         }
 
-        // eventlisteners voor validatie
-        inputEmail.addEventListener("blur", validateEmail);
-        inputEmail.addEventListener("input", validateEmail);
 
-        inputFirstName.addEventListener("blur", () => validateName(inputFirstName));
-        inputFirstName.addEventListener("input", () => validateName(inputFirstName));
+          const checkFormValidity = () => {
+        const isFormValid = validateEmail() &&
+                            validateName(inputFirstName) &&
+                            validateName(inputLastName) &&
+                            validatePhone() &&
+                            validateSubject() &&
+                            validateMessage();
 
-        inputLastName.addEventListener("blur", () => validateName(inputLastName));
-        inputLastName.addEventListener("input", () => validateName(inputLastName));
+        const isCaptchaCompleted = grecaptcha.getResponse().length > 0;
 
-        inputPhone.addEventListener("blur", validatePhone);
-        inputPhone.addEventListener("input", validatePhone);
+        submitButton.disabled = !(isFormValid && isCaptchaCompleted);
+    };
+        
+        [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
+            input.addEventListener("input", checkFormValidity);
+        });
+
+        [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
+            input.addEventListener("blur", checkFormValidity);
+        });
+
+       // // eventlisteners voor validatie
+       //  inputEmail.addEventListener("blur", validateEmail);
+       //  inputEmail.addEventListener("input", validateEmail);
+
+       //  inputFirstName.addEventListener("blur", () => validateName(inputFirstName));
+       //  inputFirstName.addEventListener("input", () => validateName(inputFirstName));
+
+       //  inputLastName.addEventListener("blur", () => validateName(inputLastName));
+       //  inputLastName.addEventListener("input", () => validateName(inputLastName));
+
+       //  inputPhone.addEventListener("blur", validatePhone);
+       //  inputPhone.addEventListener("input", validatePhone);
+
+       //  inputSubject.addEventListener("blur", validateSubject);
+       //  inputSubject.addEventListener("input", validateSubject);
+
+       //  inputMessage.addEventListener("blur", validateMessage);
+       //  inputMessage.addEventListener("input", validateMessage);
+
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();
-            validateForm();
+            checkFormValidity();
 
             if (!form.checkValidity()) {
                 return;
             }
+            if (!validateCaptcha()) {
+
+                const flashMessage = document.getElementById("flash-message");
+                    flashMessage.textContent = "Voltooi de Captcha om het formulier te versturen.";
+                    flashMessage.style.display = "block";
+                    flashMessage.classList.remove("success");
+                    flashMessage.classList.add("error");
+
+                    setTimeout(() => {
+                        flashMessage.style.display = "none";
+                    }, 5000);
+                return;
+            }
+
             showSpinner();
             const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-            const formData = new URLSearchParams(new FormData(form));
+               const formData = new URLSearchParams(new FormData(form));
+                // formData.append('__RequestVerificationToken', csrfToken);
+
 
             fetch('/contact', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': csrfToken
                 },
                 body: formData
             })
@@ -337,6 +331,7 @@
                     flashMessage.classList.add("success");
 
                     form.reset();
+                    grecaptcha.reset();
 
                     document.querySelectorAll('.error').forEach(input => {
                         input.classList.remove('error');
@@ -364,6 +359,8 @@
                     hideSpinner();
                 });
         });
+               
+
     });
 
 </script>
