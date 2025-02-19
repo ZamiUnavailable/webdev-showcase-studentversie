@@ -105,7 +105,7 @@
     background-color:#f7faf8;
 }
 
-.profile-content-contact--hidden-mobile {
+.profile-content-contact--different-mobile {
     color: rgba(39, 140, 39, 0.96);
     flex-direction: column;
     margin: 10px 0px 20px 0px;
@@ -179,9 +179,8 @@ li {
             display: flex;
         }
 
-        .profile-content-contact--hidden-mobile {
+        .profile-content-contact--different-mobile {
             margin: 140px 0px 20px 0px;
-
         }
     }
     /*student uitwerking*/
