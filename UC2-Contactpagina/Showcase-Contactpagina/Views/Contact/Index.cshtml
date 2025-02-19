@@ -83,7 +83,7 @@
 
 <script>
 
-        let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton;
+        let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton, resetButton;
 
 
          var onloadCallback = function() {
@@ -244,13 +244,15 @@
             form = document.querySelector('.form-contactpagina');
             inputEmail = document.getElementById('email');
             inputFirstName = document.getElementById('firstname');
-             inputLastName = document.getElementById('lastname');
-             inputPhone = document.getElementById('phone');
-             inputSubject = document.getElementById('subject');
-             inputMessage = document.getElementById('message');
-             captcha = document.getElementById('recaptchaTokenInputId');
-             submitButton = document.querySelector('input[type="submit"]');
-             spinner = document.getElementById('spinner');
+            inputLastName = document.getElementById('lastname');
+            inputPhone = document.getElementById('phone');
+            inputSubject = document.getElementById('subject');
+            inputMessage = document.getElementById('message');
+            captcha = document.getElementById('recaptchaTokenInputId');
+            submitButton = document.querySelector('input[type="submit"]');
+            spinner = document.getElementById('spinner');
+            resetButton = document.querySelector(".button-reset");
+
 
             // functies om de spinner te tonen en knop te (de)activeren
             const showSpinner = () => {
@@ -264,7 +266,7 @@
 
 
 
-                      const validateCaptcha = () => {
+            const validateCaptcha = () => {
                 let token = grecaptcha.getResponse();
                 if (!token) {
                     return false;
@@ -274,12 +276,8 @@
             };
 
 
-
             [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
                 input.addEventListener("input", checkFormValidity1);
-            });
-
-            [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
                 input.addEventListener("blur", checkFormValidity1);
             });
 
@@ -354,7 +352,7 @@
                         flashMessage.classList.add("success");
 
                         form.reset();
-                        document.querySelector('input[type="submit"]').disabled = true;
+                        submitButton.disabled = true;
 
                         grecaptcha.reset();
                         document.querySelectorAll('.error').forEach(input => {
@@ -386,6 +384,17 @@
                     });
             });
 
+            resetButton.addEventListener("click", () => {
+                if(validateCaptcha()){
+                    grecaptcha.reset();
+
+                }
+                submitButton.disabled = true;
+
+                document.querySelectorAll('.error').forEach(input => {
+                input.classList.remove('error');
+                });
+            });
 
         });
 
