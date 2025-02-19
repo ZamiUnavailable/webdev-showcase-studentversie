@@ -120,9 +120,13 @@ li {
     margin: 15px 0;
 }
 
-.testing{
-    flex-direction: row;
+.testing a{
+    color: rgba(39, 140, 39, 0.96);
+    
 }
+    .testing a:hover {
+        color: #1b581b;
+    }
 
 .profile-content__contact-title {
     color: rgba(39, 140, 39, 0.96);
