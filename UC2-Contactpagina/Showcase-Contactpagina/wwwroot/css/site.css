@@ -69,7 +69,11 @@
 }
 
     .flash-message.error {
-        background-color: #f44336; /* Rood voor foutmeldingen */
+        background-color: #f44336; /* rood voor foutmeldingen */
+    }
+
+    .flash-message.info {
+       background-color: #f0ad4e; /* geel voor info */
     }
 
 

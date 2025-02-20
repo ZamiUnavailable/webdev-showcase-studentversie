@@ -314,6 +314,8 @@
                         flashMessage.textContent = "Voltooi de Captcha om het formulier te versturen.";
                         flashMessage.style.display = "block";
                         flashMessage.classList.remove("success");
+                        flashMessage.classList.remove("info");
+
                         flashMessage.classList.add("error");
 
                         setTimeout(() => {
@@ -321,6 +323,17 @@
                         }, 5000);
                     return;
                 }
+                
+                const flashMessage = document.getElementById("flash-message");
+                flashMessage.textContent = "Contactformulier wordt verstuurd...";
+                flashMessage.style.display = "block";
+                flashMessage.classList.remove("success");
+                flashMessage.classList.remove("error");
+                flashMessage.classList.add("info");
+                submitButton.disabled = false;
+                setTimeout(() => {
+                    flashMessage.style.display = "none";
+                }, 5000);
 
                 showSpinner();
                 const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
@@ -349,6 +362,8 @@
                         flashMessage.textContent = "Het contactformulier is verstuurd!";
                         flashMessage.style.display = "block";
                         flashMessage.classList.remove("error");
+                        flashMessage.classList.remove("info");
+
                         flashMessage.classList.add("success");
 
                         form.reset();
@@ -371,6 +386,7 @@
                         flashMessage.textContent = "Er is iets misgegaan. Probeer het opnieuw.";
                         flashMessage.style.display = "block";
                         flashMessage.classList.remove("success");
+                        flashMessage.classList.remove("info");
                         flashMessage.classList.add("error");
                         submitButton.disabled = false;
 
