@@ -209,10 +209,10 @@
 
 
         function checkFormValidity ()  {
-        const isFormValid = validateEmail(true, true) &&
-                            validateName(inputFirstName, true, true) &&
-                            validateName(inputLastName, true, true) &&
-                            validatePhone(true, true) &&
+        const isFormValid = validateEmail(true, false) &&
+                            validateName(inputFirstName, true, false) &&
+                            validateName(inputLastName, true, false) &&
+                            validatePhone(true, false) &&
                             validateSubject() &&
                             validateMessage();
 
@@ -265,7 +265,6 @@
             };
             const hideSpinner = () => {
                 spinner.style.display = "none";
-                // submitButton.disabled = false;
             };
 
             const showFlashMessage = (message, type) =>{
@@ -278,7 +277,7 @@
 
                     flashMessage.classList.add(type);
 
-                    setTimeout(() => { //flash message na 5 sec weg
+                    setTimeout(() => { 
                         flashMessage.style.display = "none";
                     }, 7000);
             }
@@ -293,14 +292,14 @@
                 return true;
             };
 
+           // eventlisteners voor validatie
 
-            [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => {
+            [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => { //voor submit button (zonder popup)
                 input.addEventListener("input", checkFormValidity1);
                 input.addEventListener("blur", checkFormValidity1);
             });
 
-           // eventlisteners voor validatie
-            inputEmail.addEventListener("blur", () => validateEmail(true, true));
+            inputEmail.addEventListener("blur", () => validateEmail(true, true));       //voor individuele (met popup)
             inputEmail.addEventListener("input", () => validateEmail(true, true));
 
             inputFirstName.addEventListener("blur", () => validateName(inputFirstName, true, true));
@@ -333,7 +332,7 @@
                     return;
                 }
                 
-                showFlashMessage( "(⋯) Contactformulier wordt verstuurd...", "info");
+                showFlashMessage( "(⋯) Het contactformulier wordt verstuurd...", "info");
 
                 showSpinner();
 
@@ -379,8 +378,8 @@
                     })
                     .catch(error => {
                         console.error('Er was een probleem met de formulierinzending:', error);
-
                         showFlashMessage("(✘) Er is iets misgegaan. Probeer het opnieuw.", "error");
+                        submitButton.disabled = false;
                     })
                     .finally(() => {
                         hideSpinner();
@@ -401,6 +400,13 @@
             });
 
         });
+
+
+            // document.querySelectorAll("input, textarea").forEach(input => {
+            //     input.addEventListener("invalid", (event) => {
+            //         event.preventDefault(); // Prevent automatic focus
+            //         });
+            // });
 
 </script>
 
