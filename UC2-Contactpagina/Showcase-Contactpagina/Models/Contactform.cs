@@ -14,6 +14,7 @@ namespace Showcase_Contactpagina.Models
 
         public string LastName { get; set; }
 
+        [Required]
         [EmailAddress(ErrorMessage = "Ongeldig e-mailadres")]
         [StringLength(80, ErrorMessage = "Email mag niet lanfer zijn dan 60 karakters.")]
 
@@ -24,12 +25,15 @@ namespace Showcase_Contactpagina.Models
         [Phone(ErrorMessage = "Ongeldig telefoonnummer")]
         public string Phone { get; set; }
 
+        [Required]
         [StringLength(200, ErrorMessage = "Onderwerp mag niet langer zijn dan 200 karakters.")]
         public string Subject { get; set; }
 
+        [Required]
         [StringLength(600, ErrorMessage = "Bericht mag niet langer zijn dan 600 karakters.")]
         public string Message { get; set; }
 
+        [Required]
         public string? RecaptchaToken { get; set; }
     }
 }
