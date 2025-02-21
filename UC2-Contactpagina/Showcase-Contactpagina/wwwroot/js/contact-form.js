@@ -1,0 +1,346 @@
+﻿let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton, resetButton, alertBox;
+let firstNameError, lastNameError, emailError, phoneError, subjectError, messageError;
+
+
+
+var onloadCallback = function () {
+    grecaptcha.render('html_element', {
+        'sitekey': siteKey,
+        'callback': onCaptchaSuccess
+    });
+};
+function onCaptchaSuccess(token) {
+    document.getElementById("recaptchaTokenInputId").value = token;
+    checkFormValidity();
+
+}
+
+
+function validateName(input, errorId, currentField) {
+    const minLength = 2;
+    const maxLength = 60;
+    const nameValue = input.value.trim();
+    let isValid = true;
+    let errorMessage = "";
+
+    if (nameValue.length < minLength) {
+        isValid = false;
+        errorMessage = `Moet minimaal  ${minLength} tekens bevatten`;
+    } else if (nameValue.length > maxLength) {
+        isValid = false;
+        errorMessage = `Mag niet langer dan  ${maxLength} tekens zijn`;
+    }
+
+    toggleFieldErrorMessage(errorId, isValid, errorMessage);
+
+    if (currentField) {
+        updateFieldStyle(input, isValid);
+    }
+    return isValid;
+};
+
+
+function validateEmail(currentField) {
+    const maxLength = 80;
+    const emailValue = inputEmail.value.trim();
+    let isValid = true;
+    let errorMessage = "";
+
+
+    if (inputEmail.validity.typeMismatch) {
+        errorMessage = "Voer een geldig e-mailadres in";
+        isValid = false;
+    } else if (emailValue.length > maxLength) {
+        isValid = false;
+        errorMessage = `Email mag niet langer dan ${maxLength} tekens zijn`;
+    }
+
+    toggleFieldErrorMessage("emailError", isValid, errorMessage);
+
+
+    if (currentField) { updateFieldStyle(inputEmail, isValid); }
+
+    return isValid;
+};
+
+
+function validatePhone(currentField) {
+    const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
+    const phonePattern = /^[0-9+\-]{8,20}$/; // alleen cijfers, + en -
+    let isValid = phonePattern.test(phoneValue);
+    let errorMessage = "";
+
+    if (!isValid) {
+        errorMessage = "Voer een geldig telefoonnummer in";
+    }
+
+
+    if (currentField) {
+        updateFieldStyle(inputPhone, isValid);
+        toggleFieldErrorMessage("phoneError", isValid, errorMessage);
+    }
+
+    return isValid;
+};
+
+
+
+function validateSubject() {
+    const maxLength = 200;
+    const subjectValue = inputSubject.value.trim();
+    let isValid = true;
+    let errorMessage = "";
+
+    if (subjectValue.length > maxLength) {
+        errorMessage = `Onderwerp mag maximaal ${maxLength} tekens zijn`;
+        isValid = false;
+    }
+
+
+
+    toggleFieldErrorMessage("subjectError", isValid, errorMessage);
+
+    updateFieldStyle(inputSubject, isValid);
+    return isValid;
+};
+
+function validateMessage() {
+    const maxLength = 600;
+    const messageValue = inputMessage.value.trim();
+    let isValid = true;
+    let errorMessage = "";
+
+    if (messageValue.length > maxLength) {
+        errorMessage = `Bericht mag maximaal ${maxLength} tekens zijn`;
+        isValid = false;
+    }
+
+    toggleFieldErrorMessage("messageError", isValid, errorMessage);
+
+    updateFieldStyle(inputMessage, isValid);
+    return isValid;
+};
+
+
+
+
+
+function checkFormValidity() {
+    const isFormValid = validateEmail(false) &&
+        validateName(inputFirstName, false) &&
+        validateName(inputLastName, false) &&
+        validatePhone(false) &&
+        validateSubject() &&
+        validateMessage();
+
+    const isCaptchaCompleted = grecaptcha.getResponse().length > 0;
+
+    if (isFormValid) {
+        alertBox.classList.add("hideMe")
+    } else {
+        alertBox.classList.remove("hideMe")
+    }
+
+    submitButton.disabled = !(isFormValid && isCaptchaCompleted);
+};
+
+
+function updateFieldStyle(input, isValid) {
+    if (isValid) {
+        input.classList.remove("error");
+    } else {
+        input.classList.add("error");
+    }
+};
+
+function toggleFieldErrorMessage(errorId, isValid, message = "") {
+    let errorElement = document.getElementById(errorId);
+    if (errorElement) {
+        if (isValid) {
+            errorElement.style.display = "none";
+        } else {
+            errorElement.textContent = message;
+            errorElement.style.display = "block";
+        }
+    }
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    form = document.querySelector('.form-contactpagina');
+    inputEmail = document.getElementById('email');
+    inputFirstName = document.getElementById('firstname');
+    inputLastName = document.getElementById('lastname');
+    inputPhone = document.getElementById('phone');
+    inputSubject = document.getElementById('subject');
+    inputMessage = document.getElementById('message');
+    alertBox = document.getElementById('alertBox');
+    submitButton = document.querySelector('input[type="submit"]');
+    spinner = document.getElementById('spinner');
+    resetButton = document.querySelector(".button-reset");
+    firstNameError = document.getElementById("firstNameError");
+    lastNameError = document.getElementById("lastNameError");
+    emailError = document.getElementById("emailError");
+    phoneError = document.getElementById("phoneError");
+    subjectError = document.getElementById("subjectError");
+    messageError = document.getElementById("messageError");
+
+    const flashMessage = document.getElementById("flash-message");
+
+
+    // functies om de spinner te tonen en knop te (de)activeren
+    const showSpinner = () => {
+        spinner.style.display = "inline-block";
+        submitButton.disabled = true;
+    };
+    const hideSpinner = () => {
+        spinner.style.display = "none";
+    };
+
+    const showFlashMessage = (message, type) => {
+        flashMessage.textContent = message;
+        flashMessage.style.display = "block";
+        flashMessage.classList.remove("error");
+        flashMessage.classList.remove("info");
+        flashMessage.classList.remove("success");
+
+        flashMessage.classList.add(type);
+
+        setTimeout(() => {
+            flashMessage.style.display = "none";
+        }, 7000);
+    }
+
+
+    const validateCaptcha = () => {
+        let token = grecaptcha.getResponse();
+        if (!token) {
+            return false;
+        }
+        document.getElementById("recaptchaTokenInputId").value = token;
+        return true;
+    };
+
+    // eventlisteners voor validatie
+
+    [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => { //voor submit button (zonder popup)
+        input.addEventListener("input", checkFormValidity);
+        input.addEventListener("blur", checkFormValidity);
+    });
+
+    inputEmail.addEventListener("blur", () => validateEmail(true));       //voor individuele (met popup)
+    inputEmail.addEventListener("input", () => validateEmail(true));
+
+    inputFirstName.addEventListener("blur", () => validateName(inputFirstName, "firstNameError", true));
+    inputFirstName.addEventListener("input", () => validateName(inputFirstName, "firstNameError", true));
+
+    inputLastName.addEventListener("blur", () => validateName(inputLastName, "lastNameError", true));
+    inputLastName.addEventListener("input", () => validateName(inputLastName, "lastNameError", true));
+
+
+    inputPhone.addEventListener("blur", () => validatePhone(true));
+    inputPhone.addEventListener("input", () => validatePhone(true));
+
+    inputSubject.addEventListener("blur", validateSubject);
+    inputSubject.addEventListener("input", validateSubject);
+
+    inputMessage.addEventListener("blur", validateMessage);
+    inputMessage.addEventListener("input", validateMessage);
+
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        checkFormValidity();
+
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        if (!validateCaptcha()) {
+
+            showFlashMessage(" (X) Voltooi de Captcha om het formulier te versturen.", "error");
+            return;
+        }
+
+        showFlashMessage("(⋯) Het contactformulier wordt verstuurd...", "info");
+
+        showSpinner();
+
+        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        const formData = new URLSearchParams(new FormData(form));
+
+        if (!formData.get("Subject").trim()) {      ///anders doet hij moeilijk bij het versturen 
+            formData.set("Subject", "(Geen onderwerp)");
+        }
+        if (!formData.get("Message").trim()) {
+            formData.set("Message", "(Geen bericht)");
+        }
+        if (!formData.get("Email").trim()) {
+            formData.set("Email", "geen@email");
+        }
+
+        fetch('/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': csrfToken
+            },
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP-fout! Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+
+                showFlashMessage("(✔︎) Het contactformulier is verstuurd!", "success");
+
+                form.reset();
+                submitButton.disabled = true;
+
+                grecaptcha.reset();
+                document.querySelectorAll('.error').forEach(input => {
+                    input.classList.remove('error');
+                });
+            })
+            .catch(error => {
+                console.error('Er was een probleem met de formulierinzending:', error);
+                showFlashMessage("(✘) Er is iets misgegaan. Probeer het opnieuw.", "error");
+                submitButton.disabled = false;
+            })
+            .finally(() => {
+                hideSpinner();
+            });
+    });
+
+    resetButton.addEventListener("click", () => {
+        if (validateCaptcha()) {
+            grecaptcha.reset();
+        }
+        submitButton.disabled = true;
+        form.reset();
+
+        alertBox.classList.add("hideMe");
+
+        document.querySelectorAll('.error-message').forEach(error => {
+            error.style.display = 'none';
+        });
+
+        document.querySelectorAll('.error').forEach(input => {
+            input.classList.remove('error');
+        });
+    });
+
+});
+
+
+document.querySelectorAll("input, textarea").forEach(input => {
+    input.addEventListener("invalid", (event) => {
+        event.preventDefault(); // Prevent automatic focus
+    });
+});
+
