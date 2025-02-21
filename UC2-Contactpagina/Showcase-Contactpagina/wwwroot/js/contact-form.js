@@ -1,8 +1,6 @@
 ﻿let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton, resetButton, alertBox;
 let firstNameError, lastNameError, emailError, phoneError, subjectError, messageError;
 
-
-
 var onloadCallback = function () {
     grecaptcha.render('html_element', {
         'sitekey': siteKey,
@@ -12,10 +10,7 @@ var onloadCallback = function () {
 function onCaptchaSuccess(token) {
     document.getElementById("recaptchaTokenInputId").value = token;
     checkFormValidity();
-
 }
-
-
 function validateName(input, errorId, currentField) {
     const minLength = 2;
     const maxLength = 60;
@@ -39,13 +34,11 @@ function validateName(input, errorId, currentField) {
     return isValid;
 };
 
-
 function validateEmail(currentField) {
     const maxLength = 80;
     const emailValue = inputEmail.value.trim();
     let isValid = true;
     let errorMessage = "";
-
 
     if (inputEmail.validity.typeMismatch) {
         errorMessage = "Voer een geldig e-mailadres in";
@@ -57,12 +50,10 @@ function validateEmail(currentField) {
 
     toggleFieldErrorMessage("emailError", isValid, errorMessage);
 
-
     if (currentField) { updateFieldStyle(inputEmail, isValid); }
 
     return isValid;
 };
-
 
 function validatePhone(currentField) {
     const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
@@ -74,7 +65,6 @@ function validatePhone(currentField) {
         errorMessage = "Voer een geldig telefoonnummer in";
     }
 
-
     if (currentField) {
         updateFieldStyle(inputPhone, isValid);
         toggleFieldErrorMessage("phoneError", isValid, errorMessage);
@@ -82,9 +72,6 @@ function validatePhone(currentField) {
 
     return isValid;
 };
-
-
-
 function validateSubject() {
     const maxLength = 200;
     const subjectValue = inputSubject.value.trim();
@@ -95,8 +82,6 @@ function validateSubject() {
         errorMessage = `Onderwerp mag maximaal ${maxLength} tekens zijn`;
         isValid = false;
     }
-
-
 
     toggleFieldErrorMessage("subjectError", isValid, errorMessage);
 
@@ -121,10 +106,6 @@ function validateMessage() {
     return isValid;
 };
 
-
-
-
-
 function checkFormValidity() {
     const isFormValid = validateEmail(false) &&
         validateName(inputFirstName, false) &&
@@ -143,7 +124,6 @@ function checkFormValidity() {
 
     submitButton.disabled = !(isFormValid && isCaptchaCompleted);
 };
-
 
 function updateFieldStyle(input, isValid) {
     if (isValid) {
@@ -165,8 +145,6 @@ function toggleFieldErrorMessage(errorId, isValid, message = "") {
     }
 }
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
     form = document.querySelector('.form-contactpagina');
     inputEmail = document.getElementById('email');
@@ -187,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
     messageError = document.getElementById("messageError");
 
     const flashMessage = document.getElementById("flash-message");
-
 
     // functies om de spinner te tonen en knop te (de)activeren
     const showSpinner = () => {
@@ -211,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
             flashMessage.style.display = "none";
         }, 7000);
     }
-
 
     const validateCaptcha = () => {
         let token = grecaptcha.getResponse();
@@ -336,7 +312,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
-
 
 document.querySelectorAll("input, textarea").forEach(input => {
     input.addEventListener("invalid", (event) => {
