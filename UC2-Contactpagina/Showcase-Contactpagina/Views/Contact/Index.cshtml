@@ -32,34 +32,49 @@
             @Html.AntiForgeryToken()
             <input type="hidden" id="recaptchaTokenInputId" asp-for="RecaptchaToken" />
 
+            <div id="alertBox" class="adiv danger hideMe">
+                <p><strong>(!)</strong> Een of meer velden zijn ongelig!</p>
+            </div>
             <div class="form-contactpagina__inputelement fx-col">
+              
                 <label for="firstname">Voornaam* </label>
                 <input type="text" asp-for="FirstName" id="firstname" required>
+                <div class="error-message" id="firstNameError"></div>
+
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
                 <label for="lastname">Achternaam* </label>
                 <input type="text" asp-for="LastName" id="lastname" required>
+                <div class="error-message" id="lastNameError"></div>
+
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
                 <label for="email">E-mailadres </label>
                 <input type="email" asp-for="Email" id="email">
+                <div class="error-message" id="emailError"></div>
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
                 <label for="phone">Telefoonnummer* </label>
                 <input type="tel" asp-for="Phone" id="phone" required>
+                <div class="error-message" id="phoneError"></div>
+
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
                 <label for="subject">Onderwerp </label>
                 <input type="text" asp-for="Subject" id="subject">
+                <div class="error-message" id="subjectError"></div>
+
             </div>
 
             <div class="form-contactpagina__inputelement fx-col">
                 <label for="message">Bericht</label>
                 <textarea asp-for="Message" id="message" rows="4"></textarea>
+                <div class="error-message" id="messageError"></div>
+
             </div>
 
             <div id="html_element"></div>
@@ -83,11 +98,12 @@
 
 <script>
 
-        let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton, resetButton;
+        let form, inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage, submitButton, resetButton, alertBox;
+        let firstNameError, lastNameError, emailError, phoneError, subjectError, messageError;
+
 
 
          var onloadCallback = function() {
-          // alert("grecaptcha is ready!");
           grecaptcha.render('html_element', {
               'sitekey' : '@siteKey',
               'callback': onCaptchaSuccess
@@ -95,73 +111,75 @@
         };
         function onCaptchaSuccess(token) {
             document.getElementById("recaptchaTokenInputId").value = token;
-            // document.querySelector('input[type="submit"]').disabled = false;
-            //i want the checkFormValidity
             checkFormValidity();
 
         }
 
 
-            function validateName(input, showMessage, currentField) {
+            function validateName(input, errorId, currentField) {
                 const minLength = 2;
                 const maxLength = 60;
                 const nameValue = input.value.trim();
                 let isValid = true;
+                let errorMessage = "";
 
                 if (nameValue.length < minLength) {
-                    input.setCustomValidity(`Moet minimaal ${minLength} tekens bevatten.`);
                     isValid = false;
+                    errorMessage = `Moet minimaal  ${minLength} tekens bevatten`;
                 } else if (nameValue.length > maxLength) {
-                    input.setCustomValidity(`Mag niet langer dan ${maxLength} tekens zijn.`);
-                    isValid = false;
-                } else {
-                    input.setCustomValidity("");
-                }
+                    isValid = false;                    
+                    errorMessage = `Mag niet langer dan  ${maxLength} tekens zijn`;
+                } 
 
-                if(currentField){updateFieldStyle(input, isValid);}
-                if(showMessage){input.reportValidity();}
+                toggleFieldErrorMessage(errorId, isValid, errorMessage);
+
+                if(currentField){
+                    updateFieldStyle(input, isValid);
+                }
                 return isValid;
             };
 
 
-             function validateEmail(showMessage, currentField) {
+             function validateEmail(currentField) {
                     const maxLength = 80;
                     const emailValue = inputEmail.value.trim();
                     let isValid = true;
+                    let errorMessage = "";
+
 
                     if (inputEmail.validity.typeMismatch) {
-                        inputEmail.setCustomValidity("Voer een geldig e-mailadres in!");
+                        errorMessage ="Voer een geldig e-mailadres in";
                         isValid = false;
-                    } else if (emailValue.length > maxLength) {
-                        inputEmail.setCustomValidity(`Email mag niet langer dan ${maxLength} tekens zijn!`);
+                    } else if (emailValue.length > maxLength) {               
                         isValid = false;
-                    } else {
-                        inputEmail.setCustomValidity("");
-                    }
+                        errorMessage =`Email mag niet langer dan ${maxLength} tekens zijn`;
+                    } 
+
+                    toggleFieldErrorMessage("emailError", isValid, errorMessage);
+
 
                     if(currentField){updateFieldStyle(inputEmail, isValid);}
-                    if(showMessage){
-                inputEmail.reportValidity();
-                }
+
                     return isValid;
                 };
 
 
-            function validatePhone(showMessage, currentField)  {
+            function validatePhone(currentField)  {
                 const phoneValue = inputPhone.value.trim(); //trim for white spaces in front and end of a message?
                 const phonePattern = /^[0-9+\-]{8,20}$/; // alleen cijfers, + en -
                 let isValid = phonePattern.test(phoneValue);
+                let errorMessage = "";
 
                 if (!isValid) {
-                    inputPhone.setCustomValidity("Voer een geldig telefoonnummer in (8-20 cijfers, alleen + of - toegestaan).");
-                } else {
-                    inputPhone.setCustomValidity("");
+                    errorMessage ="Voer een geldig telefoonnummer in";
+                } 
+                    
+
+                if(currentField){
+                    updateFieldStyle(inputPhone, isValid);
+                    toggleFieldErrorMessage("phoneError", isValid, errorMessage);
                 }
 
-                if(currentField){updateFieldStyle(inputPhone, isValid);}
-                if(showMessage){
-                    inputPhone.reportValidity();
-                }
                 return isValid;
             };
 
@@ -171,18 +189,18 @@
                 const maxLength = 200;
                 const subjectValue = inputSubject.value.trim();
                 let isValid = true;
+                let errorMessage = "";
 
                if (subjectValue.length > maxLength) {
-                    inputSubject.setCustomValidity(`Onderwerp mag niet langer dan ${maxLength} tekens zijn!`);
+                    errorMessage = `Onderwerp mag maximaal ${maxLength} tekens zijn`;
                     isValid = false;
                 } 
                
-                else {
-                    inputSubject.setCustomValidity("");
-                }
+      
+                
+                toggleFieldErrorMessage("subjectError", isValid, errorMessage);
 
                 updateFieldStyle(inputSubject, isValid);
-                inputSubject.reportValidity();
                 return isValid;
             };
 
@@ -190,17 +208,16 @@
                 const maxLength = 600;
                 const messageValue = inputMessage.value.trim();
                 let isValid = true;
+                let errorMessage = "";
 
                 if (messageValue.length > maxLength) {
-                    inputMessage.setCustomValidity(`Bericht mag niet langer dan ${maxLength} tekens zijn!`);
+                    errorMessage =`Bericht mag maximaal ${maxLength} tekens zijn`;
                     isValid = false;
                 }
-                 else {
-                    inputMessage.setCustomValidity("");
-                }
+            
+                toggleFieldErrorMessage("messageError", isValid, errorMessage);
 
                 updateFieldStyle(inputMessage, isValid);
-                inputMessage.reportValidity();
                 return isValid;
             };
 
@@ -209,39 +226,46 @@
 
 
         function checkFormValidity ()  {
-        const isFormValid = validateEmail(true, false) &&
-                            validateName(inputFirstName, true, false) &&
-                            validateName(inputLastName, true, false) &&
-                            validatePhone(true, false) &&
+        const isFormValid = validateEmail(false) &&
+                            validateName(inputFirstName, false) &&
+                            validateName(inputLastName, false) &&
+                            validatePhone(false) &&
                             validateSubject() &&
                             validateMessage();
 
         const isCaptchaCompleted = grecaptcha.getResponse().length > 0;
+       
+        if(isFormValid){
+            alertBox.classList.add("hideMe")
+        } else{
+            alertBox.classList.remove("hideMe")
+        }
 
         submitButton.disabled = !(isFormValid && isCaptchaCompleted);
     };
 
-        function checkFormValidity1(){
-            const isFormValid = validateEmail(false, false) &&
-                                validateName(inputFirstName, false, false) &&
-                                validateName(inputLastName, false, false) &&
-                                validatePhone(false, false) &&
-                                validateSubject() &&
-                                validateMessage();
-
-            const isCaptchaCompleted = grecaptcha.getResponse().length > 0;
-
-            submitButton.disabled = !(isFormValid && isCaptchaCompleted);
+        
+        function updateFieldStyle (input, isValid) {
+            if (isValid) {
+                input.classList.remove("error");
+            } else {
+                input.classList.add("error");
+            }
         };
 
-
-                  function updateFieldStyle (input, isValid) {
+        function toggleFieldErrorMessage(errorId, isValid, message = "") {
+            let errorElement = document.getElementById(errorId);
+            if (errorElement) {
                 if (isValid) {
-                    input.classList.remove("error");
+                    errorElement.style.display = "none";
                 } else {
-                    input.classList.add("error");
+                    errorElement.textContent = message;
+                    errorElement.style.display = "block";
                 }
-            };
+            }
+        }
+
+
 
         document.addEventListener("DOMContentLoaded", () => {
             form = document.querySelector('.form-contactpagina');
@@ -251,10 +275,17 @@
             inputPhone = document.getElementById('phone');
             inputSubject = document.getElementById('subject');
             inputMessage = document.getElementById('message');
-            captcha = document.getElementById('recaptchaTokenInputId');
+            alertBox = document.getElementById('alertBox');
             submitButton = document.querySelector('input[type="submit"]');
             spinner = document.getElementById('spinner');
             resetButton = document.querySelector(".button-reset");
+            firstNameError = document.getElementById("firstNameError");
+            lastNameError = document.getElementById("lastNameError");
+            emailError = document.getElementById("emailError");
+            phoneError = document.getElementById("phoneError");
+            subjectError = document.getElementById("subjectError");
+            messageError = document.getElementById("messageError");
+            
             const flashMessage = document.getElementById("flash-message");
 
 
@@ -268,7 +299,6 @@
             };
 
             const showFlashMessage = (message, type) =>{
-                // const flashMessage = document.getElementById("flash-message");
                     flashMessage.textContent = message;
                     flashMessage.style.display = "block";
                     flashMessage.classList.remove("error");
@@ -295,21 +325,22 @@
            // eventlisteners voor validatie
 
             [inputEmail, inputFirstName, inputLastName, inputPhone, inputSubject, inputMessage].forEach(input => { //voor submit button (zonder popup)
-                input.addEventListener("input", checkFormValidity1);
-                input.addEventListener("blur", checkFormValidity1);
+                input.addEventListener("input", checkFormValidity);
+                input.addEventListener("blur", checkFormValidity);
             });
 
-            inputEmail.addEventListener("blur", () => validateEmail(true, true));       //voor individuele (met popup)
-            inputEmail.addEventListener("input", () => validateEmail(true, true));
+            inputEmail.addEventListener("blur", () => validateEmail(true));       //voor individuele (met popup)
+            inputEmail.addEventListener("input", () => validateEmail(true));
+   
+            inputFirstName.addEventListener("blur", () => validateName(inputFirstName, "firstNameError", true));
+            inputFirstName.addEventListener("input", () => validateName(inputFirstName, "firstNameError", true));
 
-            inputFirstName.addEventListener("blur", () => validateName(inputFirstName, true, true));
-            inputFirstName.addEventListener("input", () => validateName(inputFirstName, true, true));
+            inputLastName.addEventListener("blur", () => validateName(inputLastName, "lastNameError", true));
+            inputLastName.addEventListener("input", () => validateName(inputLastName, "lastNameError", true));
 
-            inputLastName.addEventListener("blur", () => validateName(inputLastName, true, true));
-            inputLastName.addEventListener("input", () => validateName(inputLastName, true, true));
 
-            inputPhone.addEventListener("blur", () => validatePhone(true, true));
-            inputPhone.addEventListener("input", () => validatePhone(true, true));
+            inputPhone.addEventListener("blur", () => validatePhone (true));
+            inputPhone.addEventListener("input", () => validatePhone(true));
 
             inputSubject.addEventListener("blur", validateSubject);
             inputSubject.addEventListener("input", validateSubject);
@@ -328,7 +359,7 @@
 
                 if (!validateCaptcha()) {
 
-                        showFlashMessage(" (X) Voltooi de Captcha om het formulier te versturen.", "error");
+                    showFlashMessage(" (X) Voltooi de Captcha om het formulier te versturen.", "error");
                     return;
                 }
                 
@@ -389,10 +420,15 @@
             resetButton.addEventListener("click", () => {
                 if(validateCaptcha()){
                     grecaptcha.reset();
-
                 }
                 submitButton.disabled = true;
                 form.reset();
+
+                alertBox.classList.add("hideMe");
+
+                document.querySelectorAll('.error-message').forEach(error => {
+                    error.style.display = 'none';
+                });
 
                 document.querySelectorAll('.error').forEach(input => {
                 input.classList.remove('error');
@@ -402,11 +438,11 @@
         });
 
 
-            // document.querySelectorAll("input, textarea").forEach(input => {
-            //     input.addEventListener("invalid", (event) => {
-            //         event.preventDefault(); // Prevent automatic focus
-            //         });
-            // });
+            document.querySelectorAll("input, textarea").forEach(input => {
+                input.addEventListener("invalid", (event) => {
+                    event.preventDefault(); // Prevent automatic focus
+                    });
+            });
 
 </script>
 

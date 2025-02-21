@@ -16,8 +16,7 @@ namespace Showcase_Contactpagina.Models
 
         [Required]
         [EmailAddress(ErrorMessage = "Ongeldig e-mailadres")]
-        [StringLength(80, ErrorMessage = "Email mag niet lanfer zijn dan 60 karakters.")]
-
+        [StringLength(80, ErrorMessage = "Email mag niet langer zijn dan 60 karakters.")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Telefoonnummer is verplicht")]
