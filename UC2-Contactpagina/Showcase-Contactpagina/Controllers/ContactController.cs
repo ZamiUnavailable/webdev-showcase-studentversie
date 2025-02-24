@@ -7,16 +7,20 @@ using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Showcase_Contactpagina.Service;
 
 namespace Showcase_Contactpagina.Controllers
 {
     public class ContactController : Controller
     {
         private readonly HttpClient _httpClient;
-        public ContactController(HttpClient httpClient)
+        private readonly IConfiguration configuration;
+        public ContactController(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri("http://localhost:5162");
+            this.configuration = configuration;
+
         }
 
         // GET: ContactController
@@ -57,10 +61,28 @@ namespace Showcase_Contactpagina.Controllers
             {
                 ViewBag.Message = "Er is iets misgegaan";
                 return View();
+            }            
+
+            if (form.RecaptchaToken == null)
+            {
+                Console.WriteLine("Did not receive token");
             }
 
+            Console.WriteLine("Did receive token: " + form.RecaptchaToken);
+
+            //Verify token
+            string secretKey = configuration["ReCaptchaSettings:SecretKey"];
+            bool success = await ReCaptchaService.verifyReCaptchaV2(form.RecaptchaToken, secretKey);
+
+            if (!success)
+            {
+                Console.WriteLine("Unvalid ReCaptcha");
+            }
+
+            Console.WriteLine("Valid ReCaptcha");
+
             ViewBag.Message = "Het contactformulier is verstuurd";
-            
+
             return View();
         }
     }
