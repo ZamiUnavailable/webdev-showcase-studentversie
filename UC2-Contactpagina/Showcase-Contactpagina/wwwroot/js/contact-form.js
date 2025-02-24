@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!validateCaptcha()) {
 
-            showFlashMessage(" (X) Voltooi de Captcha om het formulier te versturen.", "error");
+            showFlashMessage(" (✘) Voltooi de Captcha om het formulier te versturen.", "error");
             return;
         }
 

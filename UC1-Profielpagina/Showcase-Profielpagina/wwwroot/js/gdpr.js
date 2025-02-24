@@ -52,7 +52,11 @@ class GDPR {
 
     cookieStatus(status) {
 
-        if (status) localStorage.setItem('gdpr-consent-choice', status);
+        if (status) {
+            localStorage.setItem('gdpr-consent-choice', status);
+            this.saveMetaData();
+        }
+
 
 //student uitwerking
 
@@ -60,6 +64,14 @@ class GDPR {
     }
 
 //student uitwerking
+    saveMetaData() {
+        let today = new Date();
+        var currentDate = today.getDate() + "-" + (today.getMonth() + 1) + "-" + today.getFullYear();
+        var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        let metaData = { date: currentDate, time: currentTime }
+        let result = JSON.stringify(metaData);
+        localStorage.setItem('Meta Data', result);
+    }
 
 
     hideGDPR(){
